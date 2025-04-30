@@ -70,7 +70,7 @@ def main():
 
     
 
-    lang = input("Choose language (en/tr):").lower()
+    lang = input("Choose language (en):").lower()
     if lang not in MESSAGES:
         print("Unsupported language. Default: en")
         lang = 'en'
