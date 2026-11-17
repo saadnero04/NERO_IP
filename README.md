@@ -14,3 +14,23 @@ Before using the script, make sure you have the following dependencies installed
 
 Python 3
 Tor running on your machine
+
+---
+
+# Problem Channel: faceless AI-character Shorts
+
+Finds problems people are asking about right now (Reddit and YouTube search),
+then uses Claude to write a full Short. Two recurring AI characters explain the
+problem and the fix. You get the hook, script, visual prompts for each scene,
+title, hashtags and a thumbnail prompt.
+
+```bash
+pip install -r requirements.txt
+export ANTHROPIC_API_KEY=...          # from console.anthropic.com
+python -m problem_channel find        # see the trending problems
+python -m problem_channel make --count 5
+python -m problem_channel make --problem "How to stop overthinking at night"
+```
+
+Output goes to `videos/<date>/`. Paste the scene prompts into your AI video tool
+and voice the lines with TTS. See `examples/wake-up-tired.md`.
