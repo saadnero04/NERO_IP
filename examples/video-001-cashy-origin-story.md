@@ -29,3 +29,17 @@
 **Sound:** native voices from the generation. Sad piano at the start, strings at the turn, warm swell on the hug. On TikTok, add a trending sound from the app's library at the payoff, at low volume under the voices.
 
 **Rules kept:** no income numbers, no fake screenshots, no readable text generated on screens.
+
+---
+
+## Production notes (ready for Everygen)
+
+**Cast design: a "coin world".** Every character is a living coin in a stylised 3D animated look:
+- **Cashy:** a young gold coin with sunglasses pushed up on top, a forest-green hoodie with a white $ logo, white sneakers, and a tiny dent on his rim.
+- **Mom:** an older gold coin, slightly tarnished from hard work, with round glasses, a grey-streaked bun, a lavender cardigan, an apron and a plaster on one hand.
+- **The Boss:** a heavy brushed-steel coin in a pinstripe suit with a red tie and a stern moustache.
+- **Rosa the baker:** a rosy copper coin with a white bandana, a mustard apron and flour on her cheek.
+
+**Sets:** a family kitchen at night (one warm lamp, cold window light) and a cold fluorescent-lit office.
+**Colours:** cold grey-blue for the struggle, switching to warm gold at the hug.
+**Pipeline:** 6 reference sheets (GPT Image 2.5 Sunburst, 1K, about 6 credits), then one 30-second Seedance 2.5 clip at 720p with native dialogue (116 credits), then Impact Bold captions.
