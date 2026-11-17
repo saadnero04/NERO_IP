@@ -1,0 +1,294 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+  html, body { margin: 0; background: #000; }
+  #stage { width: 1080px; height: 1920px; position: relative; overflow: hidden; font-family: Inter, Arial, sans-serif; }
+  .layer { position: absolute; inset: 0; }
+  .cap { position: absolute; left: 60px; right: 60px; top: 1585px; text-align: center; font-weight: 900; font-size: 88px; line-height: 1.05;
+         text-transform: uppercase; color: #fff; paint-order: stroke fill; -webkit-text-stroke: 16px #000; letter-spacing: 1px; }
+  .cap .k { color: #ffd23a; }
+  .hook { position: absolute; left: 70px; right: 70px; top: 190px; text-align: center; font-weight: 900; font-size: 64px; line-height: 1.12; color: #fff;
+          paint-order: stroke fill; -webkit-text-stroke: 12px #000; text-transform: uppercase; }
+  .hook b { color: #ffd23a; }
+  .small { position: absolute; left: 0; right: 0; bottom: 40px; text-align: center; font-size: 26px; color: rgba(255,255,255,.55); letter-spacing: 2px; }
+</style></head>
+<body><div id="stage"></div>
+<script>
+const TIMINGS = __TIMINGS__;
+const W = 1080, H = 1920;
+const lines = TIMINGS.lines, TOTAL = TIMINGS.total;
+const SCENES = [];
+lines.forEach((l, i) => { if (!SCENES.length || SCENES[SCENES.length - 1].name !== l.scene) SCENES.push({ name: l.scene, start: i === 0 ? 0 : l.start - 0.28, lines: [] }); SCENES[SCENES.length - 1].lines.push(l); });
+SCENES.forEach((s, i) => s.end = i < SCENES.length - 1 ? SCENES[i + 1].start : TOTAL);
+const VO = { bus: 1, fails: 1, laptop: 1, grind: 1 };
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const ease = x => x < .5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2;
+const lerp = (a, b, x) => a + (b - a) * x;
+const pop = (t, t0, d = .35) => { const x = clamp((t - t0) / d); return x === 0 ? 0 : 1 + Math.sin(x * Math.PI) * .25 * (1 - x) - (1 - ease(x)) ; };
+
+// ---------- characters ----------
+const METALS = {
+  gold:   ['#fff1b0', '#f2c440', '#b9861a', '#8a6110'],
+  oldgold:['#f3e2a6', '#d9b552', '#a8822c', '#7a5b1c'],
+  steel:  ['#f1f4f6', '#c3cad0', '#8a949c', '#5d666e'],
+  copper: ['#ffd2b0', '#e39462', '#b0623a', '#7c3c1e'],
+  blue:   ['#d8ecff', '#8fb6e0', '#5b82ad', '#3a5a80'],
+};
+function coin(id, o) {
+  const m = METALS[o.metal];
+  const e = o.expr || 'neutral', mouth = clamp(o.mouth || 0), blink = o.blink;
+  const lx = o.look || 0;
+  const eyeRy = blink ? 4 : (e === 'happy' ? 30 : e === 'tired' ? 24 : 38);
+  const brow = { sad: [[-80, -78, -25, -92], [25, -92, 80, -78]], tired: [[-80, -80, -25, -86], [25, -86, 80, -80]], angry: [[-80, -98, -25, -78], [25, -78, 80, -98]],
+                 happy: [[-80, -92, -25, -100], [25, -100, 80, -92]], amazed: [[-80, -104, -25, -112], [25, -112, 80, -104]], neutral: [[-80, -90, -25, -94], [25, -94, 80, -90]] }[e] || [[-80, -90, -25, -94], [25, -94, 80, -90]];
+  let mouthSvg;
+  const my = 62;
+  if (mouth > .08) {
+    const ry = 6 + mouth * 26, rx = e === 'happy' ? 34 : 26;
+    mouthSvg = `<ellipse cx="0" cy="${my + ry * .3}" rx="${rx}" ry="${ry}" fill="#5a1414"/><ellipse cx="0" cy="${my + ry * .9}" rx="${rx * .6}" ry="${ry * .35}" fill="#d65b5b"/>`;
+  } else if (e === 'happy') mouthSvg = `<path d="M-38 ${my - 6} Q0 ${my + 34} 38 ${my - 6}" fill="#5a1414" stroke="#3a0b0b" stroke-width="4"/><path d="M-26 ${my + 4} Q0 ${my + 22} 26 ${my + 4}" fill="#d65b5b"/>`;
+  else if (e === 'sad' || e === 'tired') mouthSvg = `<path d="M-26 ${my + 10} Q0 ${my - 8} 26 ${my + 10}" fill="none" stroke="#3a0b0b" stroke-width="7" stroke-linecap="round"/>`;
+  else if (e === 'angry') mouthSvg = `<path d="M-30 ${my + 8} Q0 ${my - 4} 30 ${my + 8}" fill="none" stroke="#3a0b0b" stroke-width="8" stroke-linecap="round"/>`;
+  else if (e === 'amazed') mouthSvg = `<ellipse cx="0" cy="${my + 6}" rx="18" ry="22" fill="#5a1414"/>`;
+  else mouthSvg = `<path d="M-24 ${my} Q0 ${my + 14} 24 ${my}" fill="none" stroke="#3a0b0b" stroke-width="7" stroke-linecap="round"/>`;
+  const eye = (x) => `<ellipse cx="${x}" cy="-28" rx="30" ry="${eyeRy}" fill="#fff" stroke="${m[3]}" stroke-width="3"/>` +
+    (blink ? '' : `<circle cx="${x + lx * 8}" cy="${-24 + (e === 'sad' || e === 'tired' ? 6 : 0)}" r="17" fill="${o.iris || '#5a3a1a'}"/><circle cx="${x + lx * 8}" cy="${-24 + (e === 'sad' || e === 'tired' ? 6 : 0)}" r="9" fill="#120a04"/><circle cx="${x + lx * 8 + 7}" cy="${-32}" r="6" fill="#fff"/>`);
+  const tears = o.tears ? `<path d="M-58 8 q-6 22 0 30 q6 -8 0 -30z" fill="#9fd6ff" opacity=".9"/><path d="M58 8 q-6 22 0 30 q6 -8 0 -30z" fill="#9fd6ff" opacity=".9"/>` : '';
+  const outfit = o.outfit || {};
+  const legs = `<rect x="-48" y="230" width="30" height="${o.legH || 90}" rx="14" fill="${outfit.pants || '#333'}"/><rect x="18" y="230" width="30" height="${o.legH || 90}" rx="14" fill="${outfit.pants || '#333'}"/>
+    <ellipse cx="-36" cy="${236 + (o.legH || 90)}" rx="38" ry="18" fill="${outfit.shoes || '#fff'}"/><ellipse cx="36" cy="${236 + (o.legH || 90)}" rx="38" ry="18" fill="${outfit.shoes || '#fff'}"/>`;
+  const armL = o.armL ?? 20, armR = o.armR ?? -20;
+  const arms = `<g transform="rotate(${armL} -105 140)"><rect x="-128" y="130" width="40" height="120" rx="20" fill="${outfit.top}"/><circle cx="-108" cy="258" r="24" fill="${outfit.hand || '#fff'}"/></g>
+                <g transform="rotate(${armR} 105 140)"><rect x="88" y="130" width="40" height="120" rx="20" fill="${outfit.top}"/><circle cx="108" cy="258" r="24" fill="${outfit.hand || '#fff'}"/></g>`;
+  const torso = `<path d="M-105 110 Q-110 250 -70 250 L70 250 Q110 250 105 110 Z" fill="${outfit.top}"/>${outfit.extra || ''}`;
+  const disc = `<defs><radialGradient id="g${id}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${m[0]}"/><stop offset=".45" stop-color="${m[1]}"/><stop offset="1" stop-color="${m[2]}"/></radialGradient></defs>
+    <circle r="160" fill="${m[3]}"/><circle r="150" fill="url(#g${id})"/><circle r="153" fill="none" stroke="${m[2]}" stroke-width="10" stroke-dasharray="4 7"/>
+    <circle r="128" fill="none" stroke="${m[0]}" stroke-opacity=".35" stroke-width="3"/>`;
+  const blush = (e === 'happy' || e === 'amazed') ? `<ellipse cx="-88" cy="22" rx="20" ry="10" fill="#ff7a7a" opacity=".35"/><ellipse cx="88" cy="22" rx="20" ry="10" fill="#ff7a7a" opacity=".35"/>` : '';
+  const face = `${eye(-52)}${eye(52)}<path d="M${brow[0][0]} ${brow[0][1]} L${brow[0][2]} ${brow[0][3]}" stroke="${o.browC || '#3b2410'}" stroke-width="10" stroke-linecap="round"/><path d="M${brow[1][0]} ${brow[1][1]} L${brow[1][2]} ${brow[1][3]}" stroke="${o.browC || '#3b2410'}" stroke-width="10" stroke-linecap="round"/>${blush}${mouthSvg}${tears}`;
+  return `<g transform="translate(${o.x} ${o.y}) scale(${o.s || 1}) rotate(${o.rot || 0})">
+    <ellipse cx="0" cy="${330 + (o.legH || 90) - 80}" rx="140" ry="22" fill="#000" opacity=".28"/>
+    ${legs}${torso}${arms}${disc}${o.under || ''}${face}${o.over || ''}</g>`;
+}
+const CHAR = {
+  cashy: (o) => coin('c', { metal: 'gold', iris: '#6b3e14', outfit: { top: '#1f6b45', pants: '#3a3f44', shoes: '#f4f4f4', hand: '#f4f4f4',
+      extra: '<text x="0" y="205" text-anchor="middle" font-size="64" font-weight="900" fill="#fff" font-family="Inter,Arial">$</text>' },
+    over: '<rect x="-92" y="-176" width="80" height="40" rx="18" fill="#111"/><rect x="12" y="-176" width="80" height="40" rx="18" fill="#111"/><rect x="-14" y="-164" width="28" height="9" fill="#111"/><path d="M-120 -88 q10 -14 22 -8" stroke="#8a6110" stroke-width="5" fill="none"/>', ...o }),
+  mom: (o) => coin('m', { metal: 'oldgold', iris: '#6b5a2a', browC: '#5a4a3a', s: .9, outfit: { top: '#a99ad1', pants: '#6b6f78', shoes: '#7a5232', hand: '#f1e6d6',
+      extra: '<path d="M-60 120 L60 120 L70 250 L-70 250 Z" fill="#2c3a5c"/>' },
+    under: '<circle cx="0" cy="-168" r="44" fill="#7d6a58"/><path d="M-30 -186 q30 -18 60 0" stroke="#c9c2b8" stroke-width="6" fill="none"/>',
+    over: '<circle cx="-52" cy="-28" r="42" fill="none" stroke="#3b2c1c" stroke-width="6"/><circle cx="52" cy="-28" r="42" fill="none" stroke="#3b2c1c" stroke-width="6"/><path d="M-10 -30 h20" stroke="#3b2c1c" stroke-width="6"/>', ...o }),
+  boss: (o) => coin('b', { metal: 'steel', iris: '#3b4650', browC: '#1d1d1d', s: 1.12, outfit: { top: '#2f3338', pants: '#1e2124', shoes: '#0e0e0e', hand: '#e9ecef',
+      extra: '<path d="M-26 116 L26 116 L12 240 L0 252 L-12 240 Z" fill="#a51f2b"/><path d="M-60 112 L-14 112 L-30 170 Z M60 112 L14 112 L30 170 Z" fill="#f2f2f2"/>' },
+    under: '<path d="M-128 -86 Q-110 -170 0 -166 Q110 -170 128 -86 Q90 -140 0 -136 Q-90 -140 -128 -86Z" fill="#141414"/>',
+    over: '<path d="M-58 36 Q-30 18 0 30 Q30 18 58 36 Q30 48 0 40 Q-30 48 -58 36Z" fill="#4a4a4a"/>', ...o }),
+  rosa: (o) => coin('r', { metal: 'copper', iris: '#2f7a3a', browC: '#5a2a14', outfit: { top: '#f1e6cf', pants: '#4a6a9a', shoes: '#c4302b', hand: '#f7e0cf',
+      extra: '<path d="M-70 118 L70 118 L80 250 L-80 250 Z" fill="#d9a62b"/>' },
+    under: '<path d="M-130 -80 Q-120 -175 0 -170 Q120 -175 130 -80 Q100 -128 0 -124 Q-100 -128 -130 -80Z" fill="#f5f5f2"/><circle cx="-158" cy="10" r="14" fill="none" stroke="#e8b931" stroke-width="5"/><circle cx="158" cy="10" r="14" fill="none" stroke="#e8b931" stroke-width="5"/>',
+    over: '<ellipse cx="88" cy="30" rx="20" ry="9" fill="#fff" opacity=".75"/>', ...o }),
+  client: (o) => coin('k', { metal: 'blue', outfit: { top: '#e2e2e2', pants: '#333', shoes: '#222', hand: '#fff' }, ...o }),
+};
+
+// ---------- helpers ----------
+function activeLine(t) { return lines.find(l => t >= l.start && t <= l.end); }
+function mouthFor(who, t, scene) {
+  const l = activeLine(t); if (!l || l.speaker !== who || VO[scene]) return 0;
+  const i = Math.floor((t - l.start) * 24); const v = l.env[i] || 0; return clamp(v / 0.07);
+}
+function blinkFor(t, off) { return ((t + off) % 3.3) < .12; }
+const bob = (t, f = 1.6, a = 6, p = 0) => Math.sin((t + p) * f * Math.PI) * a;
+
+function svgWrap(inner, cam) { return `<svg class="layer" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}"><g transform="translate(540 960) scale(${cam.s}) translate(${-540 + (cam.x || 0)} ${-960 + (cam.y || 0)})">${inner}</g></svg>`; }
+
+// ---------- backgrounds ----------
+function kitchen(t, warm) {
+  const wall = warm ? ['#6a4a2a', '#3a2614'] : ['#1d2a3a', '#0c121a'];
+  const lights = [...Array(26)].map((_, i) => `<rect x="${110 + (i * 37) % 300}" y="${330 + ((i * 53) % 240)}" width="10" height="14" fill="${warm ? '#ffe3a0' : '#ffd36b'}" opacity="${.35 + ((i * 7) % 10) / 20}"/>`).join('');
+  return `<defs><linearGradient id="kw" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${wall[0]}"/><stop offset="1" stop-color="${wall[1]}"/></linearGradient>
+    <radialGradient id="lamp" cx="50%" cy="0%" r="80%"><stop offset="0" stop-color="${warm ? '#ffd27a' : '#ffcf7a'}" stop-opacity="${warm ? .55 : .42}"/><stop offset="1" stop-color="#ffcf7a" stop-opacity="0"/></radialGradient>
+    <linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${warm ? '#ffb35c' : '#0b1830'}"/><stop offset="1" stop-color="${warm ? '#ffe2a8' : '#1c2f52'}"/></linearGradient></defs>
+    <rect width="1080" height="1920" fill="url(#kw)"/>
+    <rect x="80" y="260" width="380" height="380" rx="10" fill="url(#win)" stroke="#2a2016" stroke-width="18"/>${lights}
+    ${warm ? '<circle cx="380" cy="560" r="70" fill="#fff3c4" opacity=".9"/>' : '<circle cx="390" cy="330" r="34" fill="#e8eef8" opacity=".85"/>'}
+    <path d="M270 260 v380 M80 450 h380" stroke="#2a2016" stroke-width="10"/>
+    <rect x="740" y="520" width="260" height="560" rx="12" fill="${warm ? '#c9b48c' : '#53606e'}"/><rect x="752" y="540" width="236" height="230" rx="8" fill="${warm ? '#d8c59c' : '#606d7b'}"/><rect x="960" y="800" width="10" height="80" rx="4" fill="#333"/>
+    <rect x="0" y="1080" width="1080" height="840" fill="${warm ? '#5a3c22' : '#141a22'}"/>
+    <path d="M540 0 V470" stroke="#111" stroke-width="6"/><path d="M450 470 Q540 400 630 470 Z" fill="#2a2a2a"/><ellipse cx="540" cy="476" rx="40" ry="14" fill="#fff4c8"/>
+    <path d="M440 476 L640 476 L1000 1500 L80 1500 Z" fill="url(#lamp)"/>`;
+}
+function table(warm) {
+  return `<ellipse cx="540" cy="1300" rx="420" ry="90" fill="${warm ? '#9a6a3c' : '#5a4330'}"/><rect x="140" y="1300" width="800" height="40" fill="${warm ? '#7a5230' : '#3e2e20'}"/>
+    <rect x="500" y="1340" width="80" height="420" fill="${warm ? '#6a4628' : '#33261a'}"/>`;
+}
+function bills(t) {
+  return [0, 1, 2].map(i => `<g transform="translate(${400 + i * 60} ${1262 + i * 6}) rotate(${-8 + i * 9})"><rect width="110" height="52" rx="5" fill="#6f9c6a" stroke="#3d5a3a" stroke-width="3"/><circle cx="55" cy="26" r="13" fill="none" stroke="#3d5a3a" stroke-width="3"/></g>`).join('') +
+    `<circle cx="690" cy="1272" r="20" fill="#c9a24a"/><circle cx="720" cy="1282" r="16" fill="#c9a24a"/><rect x="760" y="1210" width="60" height="70" rx="10" fill="#dcd6cc"/>`;
+}
+function office(t) {
+  const fl = (Math.sin(t * 37) > .92) ? .65 : 1;
+  let rows = '';
+  for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) rows += `<rect x="${40 + c * 260}" y="${760 + r * 150}" width="230" height="110" rx="6" fill="#6c7470" opacity="${.5 + r * .15}"/><rect x="${80 + c * 260}" y="${740 + r * 150}" width="70" height="44" rx="4" fill="#9ec3cc" opacity="${.35 + r * .1}"/>`;
+  return `<rect width="1080" height="1920" fill="#4a524f"/><rect width="1080" height="700" fill="#5d6662"/>
+    ${[0, 1, 2].map(i => `<rect x="${120 + i * 320}" y="80" width="220" height="26" rx="6" fill="#eaf4ef" opacity="${fl}"/>`).join('')}
+    <rect x="700" y="230" width="300" height="430" fill="#9fb7bd" opacity=".35" stroke="#2c3330" stroke-width="10"/>
+    <circle cx="200" cy="330" r="64" fill="#e9ecea" stroke="#2c3330" stroke-width="8"/><path d="M200 330 V286 M200 330 L232 342" stroke="#2c3330" stroke-width="7"/>
+    ${rows}<rect y="1260" width="1080" height="660" fill="#3a403d"/>
+    <rect x="560" y="1220" width="480" height="40" fill="#8d8a80"/><rect x="600" y="1060" width="190" height="150" rx="8" fill="#2a2f33"/><rect x="612" y="1072" width="166" height="118" fill="#9ec3cc" opacity=".6"/>
+    <rect x="880" y="1150" width="120" height="70" fill="#e6e1d4"/><rect x="890" y="1120" width="110" height="34" fill="#efe9dc"/>
+    <rect width="1080" height="1920" fill="#5aa080" opacity=".08"/>`;
+}
+function bus(t) {
+  let rain = '';
+  for (let i = 0; i < 70; i++) { const x = (i * 97) % 900 + 90, y = ((i * 211 + t * 900) % 900) + 260; rain += `<path d="M${x} ${y} l-6 34" stroke="#bcd3ff" stroke-width="3" opacity=".45"/>`; }
+  let bokeh = '';
+  for (let i = 0; i < 18; i++) { const x = ((i * 173 - t * 260) % 1300 + 1300) % 1300 - 110, y = 420 + (i * 71) % 520; bokeh += `<circle cx="${x}" cy="${y}" r="${20 + (i * 13) % 40}" fill="${['#ffcf6b', '#ff8a5c', '#9ec7ff'][i % 3]}" opacity=".22"/>`; }
+  return `<rect width="1080" height="1920" fill="#0d1422"/><rect x="60" y="230" width="960" height="1000" rx="40" fill="#101b30"/>${bokeh}${rain}
+    <rect x="60" y="230" width="960" height="1000" rx="40" fill="none" stroke="#2b3446" stroke-width="30"/><rect y="1200" width="1080" height="720" fill="#1a2232"/>
+    <rect x="0" y="1150" width="1080" height="90" fill="#232c3e"/><rect width="1080" height="1920" fill="#2a4a8a" opacity=".12"/>`;
+}
+function chart(t, t0) {
+  const p = clamp((t - t0) / 1.6);
+  const pts = [[120, 520], [260, 470], [380, 540], [500, 430], [620, 620], [760, 760], [900, 980]];
+  const n = 1 + p * (pts.length - 1), full = Math.floor(n);
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i <= full && i < pts.length; i++) d += ` L${pts[i][0]} ${pts[i][1]}`;
+  if (full < pts.length - 1) { const f = n - full, a = pts[full], b = pts[full + 1]; d += ` L${lerp(a[0], b[0], f)} ${lerp(a[1], b[1], f)}`; }
+  const grid = [...Array(6)].map((_, i) => `<path d="M100 ${320 + i * 140} H980" stroke="#2a3340" stroke-width="3"/>`).join('');
+  const stamp = p > .95 ? `<g transform="translate(560 1080) rotate(-10) scale(${clamp((t - t0 - 1.5) * 4, 0, 1.15)})"><rect x="-230" y="-70" width="460" height="140" rx="14" fill="none" stroke="#ff4a4a" stroke-width="12"/><text y="34" text-anchor="middle" font-size="96" font-weight="900" fill="#ff4a4a" font-family="Inter,Arial">LOSS</text></g>` : '';
+  return `<rect width="1080" height="1920" fill="#0e1218"/><rect x="80" y="260" width="920" height="900" rx="20" fill="#121823" stroke="#2a3340" stroke-width="4"/>${grid}
+    <path d="${d}" fill="none" stroke="#ff4a4a" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>${stamp}`;
+}
+function boxes(t, t0) {
+  let b = '';
+  const spots = [[160, 1000], [420, 1000], [680, 1000], [290, 820], [550, 820], [420, 640]];
+  spots.forEach((s, i) => { const k = clamp((t - t0 - i * .12) * 5); if (k <= 0) return; const y = lerp(s[1] - 300, s[1], ease(k));
+    b += `<g transform="translate(${s[0]} ${y})"><rect width="240" height="180" rx="8" fill="#b88a55" stroke="#7a5630" stroke-width="5"/><path d="M0 50 H240 M120 0 V50" stroke="#7a5630" stroke-width="5"/>
+      <g transform="translate(120 118) rotate(-8)"><rect x="-96" y="-28" width="192" height="56" rx="6" fill="none" stroke="#d93030" stroke-width="6"/><text y="14" text-anchor="middle" font-size="34" font-weight="900" fill="#d93030" font-family="Inter,Arial">RETURNED</text></g></g>`; });
+  return `<rect width="1080" height="1920" fill="#2a2620"/><rect y="1180" width="1080" height="740" fill="#1c1914"/>${b}`;
+}
+function darkroom(t, warmK) {
+  return `<defs><radialGradient id="glow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffcf6b" stop-opacity="${.25 + warmK * .35}"/><stop offset="1" stop-color="#ffcf6b" stop-opacity="0"/></radialGradient></defs>
+    <rect width="1080" height="1920" fill="#0a0d12"/><circle cx="540" cy="1000" r="760" fill="url(#glow)"/><rect y="1260" width="1080" height="660" fill="#151109"/>`;
+}
+function laptop(t, t0) {
+  const bub = (k, y, txt, right) => { const s = clamp((t - t0 - k) * 5); if (s <= 0) return ''; return `<g transform="translate(${right ? 640 : 300} ${y}) scale(${s})"><rect x="-150" y="-34" width="300" height="68" rx="34" fill="${right ? '#ffd23a' : '#ffffff'}"/><text y="12" text-anchor="middle" font-size="27" font-weight="700" fill="#1a1a1a" font-family="Inter,Arial">${txt}</text></g>`; };
+  return `<rect x="170" y="420" width="740" height="480" rx="24" fill="#20242c" stroke="#0b0b0b" stroke-width="10"/><rect x="200" y="450" width="680" height="420" rx="10" fill="#fdf6e6"/>
+    <rect x="200" y="450" width="680" height="64" fill="#1f6b45"/><circle cx="246" cy="482" r="18" fill="#ffd23a"/><text x="280" y="494" font-size="30" font-weight="800" fill="#fff" font-family="Inter,Arial">Bakery Assistant</text>
+    ${bub(.5, 580, 'Open on Sunday?', false)}${bub(1.2, 670, 'Yes! 8am to 2pm 🥐', true)}${bub(2.0, 760, 'Can I pre-order?', false)}${bub(2.7, 850 - 0, 'Of course! Name?', true)}
+    <path d="M110 900 L970 900 L1030 960 L50 960 Z" fill="#2c313a"/>`;
+}
+function bakery(t) {
+  const loaves = [...Array(10)].map((_, i) => `<ellipse cx="${130 + (i % 5) * 200}" cy="${380 + Math.floor(i / 5) * 190}" rx="80" ry="40" fill="${['#c98a3e', '#b9732c', '#d9a55a'][i % 3]}"/><path d="M${90 + (i % 5) * 200} ${372 + Math.floor(i / 5) * 190} q40 -14 80 0" stroke="#8a5420" stroke-width="5" fill="none"/>`).join('');
+  return `<rect width="1080" height="1920" fill="#f4dcb0"/><rect width="1080" height="820" fill="#e9c58c"/>
+    ${[0, 1].map(i => `<rect x="30" y="${440 + i * 190}" width="1020" height="22" fill="#8a5a2c"/>`).join('')}${loaves}
+    <rect y="1220" width="1080" height="700" fill="#b9824a"/><rect y="1190" width="1080" height="50" fill="#d9a46a"/>
+    <rect width="1080" height="1920" fill="#ffb347" opacity=".08"/>`;
+}
+function phone(x, y, t, t0) {
+  const s = clamp((t - t0) * 3);
+  return `<g transform="translate(${x} ${y}) rotate(-8)"><rect x="-70" y="-120" width="140" height="240" rx="22" fill="#111"/><rect x="-60" y="-106" width="120" height="212" rx="12" fill="#fdf6e6"/>
+    <rect x="-50" y="-80" width="${80 * s}" height="26" rx="13" fill="#ddd"/><rect x="${-30}" y="-40" width="${80 * s}" height="26" rx="13" fill="#ffd23a"/><rect x="-50" y="0" width="${70 * s}" height="26" rx="13" fill="#ddd"/><rect x="-20" y="40" width="${70 * s}" height="26" rx="13" fill="#ffd23a"/></g>`;
+}
+function grindShot(k, t, t0) {
+  if (k === 0) return `<rect width="1080" height="1920" fill="#0b0f18"/><rect x="190" y="560" width="700" height="300" rx="30" fill="#05070b" stroke="#222" stroke-width="8"/>
+      <text x="540" y="770" text-anchor="middle" font-size="190" font-weight="900" fill="#ff5a3c" font-family="Inter,Arial" opacity="${((t * 2) % 1) < .7 ? 1 : .5}">2:00</text><text x="840" y="680" text-anchor="end" font-size="44" font-weight="800" fill="#ff5a3c" font-family="Inter,Arial">AM</text>`;
+  if (k === 1) { const notes = ['CAFÉ ✓', 'GYM ✓', 'BARBER ✓', 'DENTIST ✓', 'FLORIST', 'BAKERY ✓'];
+    return `<rect width="1080" height="1920" fill="#2a2f3a"/>` + notes.map((n, i) => { const s = clamp((t - t0 - i * .07) * 6); return `<g transform="translate(${220 + (i % 3) * 320} ${520 + Math.floor(i / 3) * 330}) rotate(${(i % 2 ? 5 : -5)}) scale(${s})"><rect x="-130" y="-120" width="260" height="240" fill="${['#ffe066', '#ffadad', '#a0e7a0'][i % 3]}"/><text y="18" text-anchor="middle" font-size="44" font-weight="900" fill="#222" font-family="Inter,Arial">${n}</text></g>`; }).join(''); }
+  return `<rect width="1080" height="1920" fill="#e9dcc4"/><rect y="1200" width="1080" height="720" fill="#c7b08a"/>`;
+}
+function sparkles(t, n = 22, col = '#ffe58a') {
+  let s = ''; for (let i = 0; i < n; i++) { const x = (i * 137) % 1000 + 40, y = 300 + ((i * 263) % 900) - ((t * 60 + i * 20) % 200), r = 4 + (i % 4) * 3, o = .4 + .6 * Math.abs(Math.sin(t * 3 + i));
+    s += `<path d="M${x} ${y - r * 2} L${x + r * .6} ${y - r * .6} L${x + r * 2} ${y} L${x + r * .6} ${y + r * .6} L${x} ${y + r * 2} L${x - r * .6} ${y + r * .6} L${x - r * 2} ${y} L${x - r * .6} ${y - r * .6}Z" fill="${col}" opacity="${o}"/>`; } return s;
+}
+
+// ---------- scenes ----------
+function drawScene(sc, t) {
+  const lt = t - sc.start, dur = sc.end - sc.start, k = lt / dur;
+  const cam = { s: 1 + k * .07, x: 0, y: 0 };
+  let inner = '', grade = 'none';
+  const L = sc.lines;
+  if (sc.name === 'kitchen') {
+    const momTalk = t >= L[1].start - .1;
+    inner = kitchen(t, false) + table(false) +
+      CHAR.mom({ x: 330, y: 1040 + bob(t, .5, 3), expr: 'tired', mouth: mouthFor('mom', t, sc.name), blink: blinkFor(t, .4), look: momTalk ? 1 : -.4, armL: 35, armR: -40 }) + bills(t) +
+      CHAR.cashy({ x: 820, y: 1120 + bob(t, .6, 3, 1), expr: 'sad', mouth: mouthFor('cashy', t, sc.name), blink: blinkFor(t, 1.7), look: -1, s: .95, armL: 10, armR: -5 });
+    grade = 'cool'; cam.x = momTalk ? 60 : -40;
+  } else if (sc.name === 'office') {
+    const slam = clamp(lt / .25); const shake = lt < .5 ? Math.sin(lt * 90) * 14 * (1 - lt / .5) : 0;
+    inner = office(t) + CHAR.cashy({ x: 820, y: 1060, s: .7, expr: 'sad', blink: blinkFor(t, .2), look: -1, armL: 30, armR: -30 }) +
+      CHAR.boss({ x: 360 + shake, y: 1020, expr: 'angry', mouth: mouthFor('boss', t, sc.name), blink: false, look: 1, armL: 15, armR: -70 - slam * 30 }) +
+      `<g transform="translate(${560 + shake} ${lerp(900, 1190, ease(slam))}) rotate(${lerp(-30, -4, slam)})"><rect x="-90" y="-30" width="200" height="60" rx="6" fill="#d8b05a" stroke="#8a6a2a" stroke-width="5"/></g>`;
+    cam.s = 1.04 + k * .06; cam.y = shake; grade = 'cold';
+  } else if (sc.name === 'bus') {
+    inner = bus(t) + CHAR.cashy({ x: 540, y: 1180 + bob(t, .9, 5), rot: -6, expr: 'tired', blink: (t % 2.4) < .5, look: .8, armL: 8, armR: -8 });
+    grade = 'cool';
+  } else if (sc.name === 'fails') {
+    const split = sc.start + dur * .42;
+    if (t < split) inner = chart(t, sc.start + .1) + CHAR.cashy({ x: 540, y: 1300, s: .85, expr: t > sc.start + 1.4 ? 'amazed' : 'neutral', blink: blinkFor(t, .9), look: 0, armL: -60, armR: 60 });
+    else inner = boxes(t, split) + CHAR.cashy({ x: 820, y: 1320, s: .75, expr: 'sad', blink: blinkFor(t, .3), look: -1, armL: 20, armR: -20 });
+    grade = 'desat'; if (t >= split) cam.s = 1 + (t - split) / (sc.end - split) * .06;
+  } else if (sc.name === 'laptop') {
+    const warmK = clamp(k * 1.4);
+    inner = darkroom(t, warmK) + laptop(t, sc.start) + CHAR.cashy({ x: 540, y: 1200, s: .8, expr: k > .45 ? 'happy' : 'neutral', blink: blinkFor(t, 2.2), look: 0, armL: -25, armR: 25 });
+    cam.s = 1.0 + k * .12; cam.y = -k * 40; grade = k > .5 ? 'warm' : 'none';
+  } else if (sc.name === 'bakery') {
+    const cashyTalk = t >= L[1].start - .1;
+    inner = bakery(t) + CHAR.rosa({ x: 330, y: 1010 + bob(t, .7, 4), expr: 'amazed', mouth: mouthFor('rosa', t, sc.name), blink: blinkFor(t, 1.1), look: cashyTalk ? 1 : .2, armL: 20, armR: -95 }) +
+      phone(470, 1010, t, sc.start + .3) + CHAR.cashy({ x: 780, y: 1060 + bob(t, .8, 4, .5), s: .92, expr: 'happy', mouth: mouthFor('cashy', t, sc.name), blink: blinkFor(t, 2.6), look: -1, armL: 10, armR: -10 });
+    cam.x = cashyTalk ? -70 : 50; grade = 'warm';
+  } else if (sc.name === 'grind') {
+    const sub = Math.min(2, Math.floor(k * 3)), st = sc.start + sub * dur / 3;
+    inner = grindShot(sub, t, st);
+    if (sub === 0) inner += CHAR.cashy({ x: 540, y: 1220, s: .8, expr: 'tired', blink: (t % 1.6) < .3, armL: 10, armR: -10 });
+    if (sub === 1) inner += '';
+    if (sub === 2) inner += CHAR.client({ x: 330, y: 1000, s: .9, expr: 'happy', blink: blinkFor(t, .5), look: 1, armL: 10, armR: -75 }) + CHAR.cashy({ x: 750, y: 1000, s: .9, expr: 'happy', blink: blinkFor(t, .1), look: -1, armL: 75, armR: -10 }) +
+      `<circle cx="540" cy="1150" r="${30 + Math.sin(t * 12) * 3}" fill="#f4f4f4" stroke="#bbb" stroke-width="4"/>`;
+    cam.s = 1.02 + ((k * 3) % 1) * .08; grade = sub === 0 ? 'cool' : 'warm';
+  } else if (sc.name === 'payoff') {
+    const hugT = L[1].start + .1, hug = ease(clamp((t - hugT) / .7));
+    const env = t < hugT ? `<g transform="translate(${lerp(560, 560, hug)} 1120) rotate(-6)"><rect x="-90" y="-56" width="180" height="112" rx="8" fill="#fbf7ee" stroke="#d9cfb8" stroke-width="4"/><path d="M-90 -56 L0 10 L90 -56" fill="none" stroke="#d9cfb8" stroke-width="4"/><circle cx="0" cy="10" r="20" fill="#e8b931"/></g>` : '';
+    inner = kitchen(t, true) + table(true) +
+      CHAR.mom({ x: lerp(380, 470, hug), y: 1030, expr: hug > .1 ? 'happy' : 'amazed', tears: true, mouth: mouthFor('mom', t, sc.name), blink: blinkFor(t, .8), look: 1, armL: lerp(-40, -110, hug), armR: lerp(-60, -120, hug) }) + env +
+      CHAR.cashy({ x: lerp(780, 640, hug), y: 1080, s: .95, expr: 'happy', mouth: mouthFor('cashy', t, sc.name), blink: blinkFor(t, 2.1), look: -1, armL: lerp(10, 100, hug), armR: lerp(-10, 60, hug) }) +
+      sparkles(t, 26) + (hug > .3 ? `<path d="M540 760 c-30 -40 -90 -10 -60 40 l60 60 l60 -60 c30 -50 -30 -80 -60 -40z" fill="#ff6b8b" opacity="${hug}" transform="translate(0 ${-hug * 40})"/>` : '');
+    grade = 'gold'; cam.s = 1.02 + k * .1; cam.y = -30;
+  } else if (sc.name === 'cta') {
+    const pulse = 1 + Math.sin(t * 6) * .04, inK = ease(clamp(lt / .5));
+    inner = `<defs><radialGradient id="cg" cx="50%" cy="40%" r="70%"><stop offset="0" stop-color="#3a3416"/><stop offset=".6" stop-color="#121410"/><stop offset="1" stop-color="#060706"/></radialGradient></defs>
+      <rect width="1080" height="1920" fill="url(#cg)"/>${sparkles(t, 30)}
+      ${CHAR.cashy({ x: 540, y: 560 + bob(t, 1, 8), s: .9 * inK, expr: 'happy', mouth: mouthFor('cashy', t, sc.name), blink: blinkFor(t, .6), look: 0, armL: 20, armR: -140 + Math.sin(t * 8) * 20 })}
+      <g transform="translate(540 1060) scale(${pulse * inK})"><text y="-90" text-anchor="middle" font-size="84" font-weight="900" fill="#fff" font-family="Inter,Arial" letter-spacing="6">COMMENT</text>
+        <text y="150" text-anchor="middle" font-size="260" font-weight="900" fill="#ffd23a" stroke="#7a5a00" stroke-width="6" font-family="Inter,Arial">"AI"</text></g>
+      <g transform="translate(540 1785)"><text text-anchor="middle" font-size="40" font-weight="800" fill="#fff" font-family="Inter,Arial" letter-spacing="3">@AIMONEYMOVES</text></g>`;
+    cam.s = 1;
+  }
+  return { svg: svgWrap(inner, cam), grade };
+}
+
+const GRADES = { cool: 'rgba(40,80,150,.20)', cold: 'rgba(60,110,100,.16)', desat: 'rgba(30,30,40,.30)', warm: 'rgba(255,170,60,.10)', gold: 'rgba(255,190,70,.16)', none: 'rgba(0,0,0,0)' };
+function captionFor(t) {
+  const l = activeLine(t); if (!l) return '';
+  const words = l.text.replace(/\.\.\./g, '…').replace(/A\.I\./g, 'AI').split(/\s+/);
+  const chunks = []; for (let i = 0; i < words.length;) { const n = (words[i].length > 7 || i + 1 >= words.length) ? 1 : 2; chunks.push(words.slice(i, i + n)); i += n; }
+  const lens = chunks.map(c => c.join(' ').length + 3), tot = lens.reduce((a, b) => a + b, 0);
+  const p = (t - l.start) / (l.end - l.start); let acc = 0, idx = 0;
+  for (let i = 0; i < chunks.length; i++) { acc += lens[i] / tot; if (p <= acc) { idx = i; break; } idx = i; }
+  const KEY = /^(MOM|AI|BOSS|BILLS|REST|PLAYBOOK|TRADING|DROPSHIPPING|LOST|CHATBOT|SLEEP|CLIENT|NIGHT|COMMENT|YOU|TWO|JOBS|MONTH)/i;
+  return chunks[idx].map(w => KEY.test(w.replace(/[^A-Za-z]/g, '')) ? `<span class="k">${w}</span>` : w).join(' ');
+}
+window.renderFrame = function (t) {
+  const sc = SCENES.find(s => t >= s.start && t < s.end) || SCENES[SCENES.length - 1];
+  const { svg, grade } = drawScene(sc, t);
+  const sinceCut = t - sc.start, flash = sc.start > 0 && sinceCut < .12 ? (1 - sinceCut / .12) * .55 : 0;
+  const hook = t < 3.0 ? `<div class="hook" style="opacity:${clamp((3.0 - t) * 3)}">He was tired of watching <b>his mom</b> struggle…</div>` : '';
+  const cap = captionFor(t);
+  document.getElementById('stage').innerHTML = svg +
+    `<div class="layer" style="background:${GRADES[grade]}"></div>` +
+    `<div class="layer" style="background:radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%)"></div>` +
+    (flash ? `<div class="layer" style="background:#fff;opacity:${flash}"></div>` : '') + hook +
+    (cap ? `<div class="cap">${cap}</div>` : '') +
+    `<div class="small">${sc.name === 'cta' ? 'Animated character story · Results vary · Not financial advice' : 'AI MONEY MOVES'}</div>`;
+};
+window.SCENES = SCENES;
+renderFrame(0);
+</script></body></html>

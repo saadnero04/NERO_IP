@@ -1,0 +1,14 @@
+[
+ {"scene":"kitchen","speaker":"cashy","text":"Mom... you can't keep working two jobs."},
+ {"scene":"kitchen","speaker":"mom","text":"Someone has to pay the rent, sweetie."},
+ {"scene":"office","speaker":"boss","text":"Overtime again. Or don't come back."},
+ {"scene":"bus","speaker":"cashy","text":"Same boss. Same bills. Every single month."},
+ {"scene":"fails","speaker":"cashy","text":"I tried trading. Dropshipping. I lost more than I made."},
+ {"scene":"laptop","speaker":"cashy","text":"Then I found A.I. automation, and started helping small businesses."},
+ {"scene":"bakery","speaker":"rosa","text":"You built this chatbot in one night?!"},
+ {"scene":"bakery","speaker":"cashy","text":"And it answers your customers while you sleep."},
+ {"scene":"grind","speaker":"cashy","text":"Client after client. Night after night."},
+ {"scene":"payoff","speaker":"mom","text":"Is this... for me?"},
+ {"scene":"payoff","speaker":"cashy","text":"Mom. You can rest now."},
+ {"scene":"cta","speaker":"cashy","text":"I was exactly like you. Comment A.I., and I'll send you my playbook."}
+]
