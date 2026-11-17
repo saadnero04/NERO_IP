@@ -66,6 +66,29 @@
   .toc li::before { content: counter(c, decimal-leading-zero); color: var(--brand); font-weight: 800; width: 9mm; }
   .small { font-size: 9pt; color: var(--muted); }
   .two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+
+  /* Chapter openers and part pages */
+  .divider { page-break-before: always; page-break-after: always; min-height: 245mm; display: flex; flex-direction: column; justify-content: center; }
+  .divider .num { width: 34mm; height: 34mm; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #ffe58a, #e8b931 50%, #b8860b 100%);
+                  display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif; font-size: 30pt; font-weight: 800; color: #3d2c00; margin-bottom: 8mm; }
+  .divider .label { color: var(--brand); font-weight: 800; letter-spacing: .14em; font-size: 10pt; text-transform: uppercase; }
+  .divider h1 { font-size: 34pt; margin: 3mm 0 10mm; max-width: 160mm; }
+  .divider .inside { border-top: 0.5mm solid var(--line); padding-top: 5mm; }
+  .divider .inside p { font-weight: 700; color: var(--muted); font-size: 9pt; letter-spacing: .1em; text-transform: uppercase; }
+  .divider .inside li { font-size: 11.5pt; }
+  .part { page-break-before: always; page-break-after: always; height: 248mm; background: var(--brand-dark); color: #fff;
+          border-radius: 4mm; padding: 0 16mm; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+  .part h1 { color: #fff; font-size: 40pt; }
+  .part .label { color: var(--gold); font-weight: 800; letter-spacing: .16em; }
+  .takeaways { background: var(--tint); border-radius: 3mm; padding: 4mm 5mm; margin-top: 6mm; page-break-inside: avoid; }
+  .takeaways h3 { margin-top: 0; color: var(--brand-dark); }
+  .takeaways li { list-style: none; position: relative; }
+  .takeaways li::before { content: "✓"; position: absolute; left: -5mm; color: var(--brand); font-weight: 800; }
+  .worksheet { page-break-before: always; }
+  .worksheet table td { height: 9mm; }
+  .lines div { border-bottom: 0.3mm solid var(--line); height: 9mm; }
+  .scenario { border: 0.4mm solid var(--line); border-radius: 3mm; padding: 4mm 5mm; margin: 4mm 0; page-break-inside: avoid; }
+  .scenario .tag { font-size: 8pt; font-weight: 800; color: var(--muted); letter-spacing: .1em; }
 </style>
 </head>
 <body>
@@ -73,7 +96,7 @@
 <section class="cover">
   <span class="tag">2026 EDITION</span>
   <h1>The AI Side Income Playbook</h1>
-  <p class="sub">A practical, step-by-step plan to sell AI-powered services to small businesses and land your first paying clients, without quitting your job.</p>
+  <p class="sub">Land your first paying clients with AI services, then grow into digital products and your own brand. Step by step, without quitting your job.</p>
   <div class="coin">$</div>
   <p class="by">by Cashy · Practical money moves for 2026</p>
 </section>
@@ -88,6 +111,7 @@
   </div>
   <div class="toc">
     <h2>Contents</h2>
+    <p class="small"><strong>PART 1: YOUR FIRST INCOME WITH AI SERVICES</strong></p>
     <ol>
       <li>Why one salary isn't enough anymore</li>
       <li>The 2026 opportunity: businesses need AI, not AI courses</li>
@@ -99,7 +123,18 @@
       <li>From first client to steady income</li>
       <li>How to spot "make money with AI" scams</li>
       <li>Your 30-day action plan</li>
-      <li>Bonus: 50 prompts, templates and calculators</li>
     </ol>
+    <p class="small" style="margin-top:4mm"><strong>PART 2: GROW BEYOND CLIENTS</strong></p>
+    <ol start="11" style="counter-reset: c 10">
+      <li>Create digital products with AI</li>
+      <li>Where to sell: Gumroad, Payhip, Etsy, Shopify and Amazon KDP</li>
+      <li>Marketing with short videos</li>
+      <li>Your sales page, emails and automation</li>
+      <li>From side hustle to brand</li>
+    </ol>
+    <p class="small" style="margin-top:4mm"><strong>PART 3: WORKBOOK AND BONUSES</strong></p>
+    <ul style="list-style:none;padding-left:0">
+      <li>Printable worksheets · 50 prompts · Tool kit</li>
+    </ul>
   </div>
 </section>
