@@ -45,6 +45,33 @@ DEFAULT_SEEDS = [
 ]
 
 
+MONEY_SUBREDDITS = [
+    "personalfinance",
+    "povertyfinance",
+    "sidehustle",
+    "WorkOnline",
+    "beermoney",
+    "Entrepreneur",
+    "passive_income",
+    "careerguidance",
+]
+
+MONEY_SEEDS = [
+    "how to make money",
+    "how to make money online",
+    "how to pay off",
+    "how to save money when",
+    "why am i always broke",
+    "side hustle",
+    "how to make money with ai",
+]
+
+NICHES = {
+    "general": (DEFAULT_SUBREDDITS, DEFAULT_SEEDS),
+    "money": (MONEY_SUBREDDITS, MONEY_SEEDS),
+}
+
+
 @dataclass
 class Problem:
     text: str
@@ -124,25 +151,27 @@ def from_youtube_autocomplete(seeds=DEFAULT_SEEDS, letters: str = "abcdefghijklm
     return problems
 
 
-def load_sample() -> list[Problem]:
-    path = Path(__file__).with_name("sample_problems.json")
+def load_sample(niche: str = "general") -> list[Problem]:
+    name = "sample_money_problems.json" if niche == "money" else "sample_problems.json"
+    path = Path(__file__).with_name(name)
     return [Problem(**p) for p in json.loads(path.read_text())]
 
 
-def find_problems(use_reddit=True, use_youtube=True, offline=False, top: int = 30) -> list[Problem]:
+def find_problems(use_reddit=True, use_youtube=True, offline=False, top: int = 30, niche: str = "general") -> list[Problem]:
+    subreddits, seeds = NICHES[niche]
     if offline:
-        problems = load_sample()
+        problems = load_sample(niche)
     else:
         problems = []
         if use_reddit:
             print("Searching Reddit...")
-            problems += from_reddit()
+            problems += from_reddit(subreddits)
         if use_youtube:
             print("Searching YouTube autocomplete...")
-            problems += from_youtube_autocomplete()
+            problems += from_youtube_autocomplete(seeds)
         if not problems:
             print("No live results (network blocked?). Falling back to sample problems.")
-            problems = load_sample()
+            problems = load_sample(niche)
 
     # De-duplicate by lowercase text, keep the best score.
     best: dict[str, Problem] = {}

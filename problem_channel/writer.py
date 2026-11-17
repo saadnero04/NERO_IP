@@ -81,6 +81,85 @@ def write_video(problem: str, style: str = "cute 3D Pixar-like animation", clien
     return response.parsed_output
 
 
+# ---------------------------------------------------------------------------
+# Money niche: one recurring main character + a comment-to-ebook funnel
+# ---------------------------------------------------------------------------
+
+MAIN_CHARACTER = Character(
+    name="Cashy",
+    role="fixer",
+    look=(
+        "a shiny gold coin character with a friendly face, black sunglasses pushed up on his head, "
+        "a green hoodie with a small white dollar-sign logo, white sneakers, expressive cartoon eyes, "
+        "3D Pixar-like style, standing in a cozy modern room with a laptop glowing behind him"
+    ),
+    voice="warm, confident, slightly fast, like a big brother giving real advice",
+)
+
+MONEY_SYSTEM = f"""You write faceless Shorts / Reels / TikToks for a money channel.
+There is ONE main character, always the same: {MAIN_CHARACTER.name} — {MAIN_CHARACTER.look}.
+Voice: {MAIN_CHARACTER.voice}. Every visual prompt must describe him this exact way.
+
+Every video follows these 5 beats (35-55 seconds, 100-140 spoken words):
+1. HOOK (0-3s): name the money pain the viewer feels right now
+   (rent, debt, salary not enough, no savings...). No greetings.
+2. PROBLEM: one or two relatable lines about why the usual answer doesn't work.
+3. THE DOMAIN: "The best thing you can do in 2026 is ..." then the domain you are
+   given, explained in plain words in one or two sentences.
+4. PROOF: show that people really make money with it using AI.
+   STRICT RULES: only use facts that are real and publicly verifiable (a known
+   platform's public numbers, a widely reported trend, a real public case).
+   Never invent names, testimonials, screenshots or income figures. Never promise
+   the viewer a specific income or say it's guaranteed, easy or fast. Put every
+   factual claim you use in claims_to_verify so the creator can check it.
+   If you are not sure a fact is true, describe the opportunity instead.
+5. CTA: "If you want to start, comment {{cta_word}} and I'll send you the details."
+   Then one short loop line.
+
+Also give an on-screen disclaimer in the description: results vary, not financial advice.
+"""
+
+
+class MoneyVideoPlan(VideoPlan):
+    domain: str
+    cta: str
+    claims_to_verify: List[str]
+
+
+def write_money_video(
+    problem: str,
+    domain: str,
+    cta_word: str = "AI",
+    language: str = "English",
+    client: anthropic.Anthropic | None = None,
+) -> MoneyVideoPlan:
+    client = client or anthropic.Anthropic()
+    response = client.beta.messages.parse(
+        model=MODEL,
+        max_tokens=16000,
+        betas=["server-side-fallback-2026-07-01"],
+        fallbacks="default",
+        output_config={"effort": "medium"},
+        system=MONEY_SYSTEM.replace("{cta_word}", cta_word),
+        messages=[
+            {
+                "role": "user",
+                "content": (
+                    f"Write the video in {language}.\n"
+                    f"Money problem people are asking about: {problem}\n"
+                    f"Domain to recommend: {domain}\n"
+                    f"Comment keyword: {cta_word}\n"
+                    f"The characters list must contain only {MAIN_CHARACTER.name}."
+                ),
+            }
+        ],
+        output_format=MoneyVideoPlan,
+    )
+    if response.stop_reason == "refusal":
+        raise RuntimeError(f"Claude declined this topic: {problem!r}")
+    return response.parsed_output
+
+
 def to_markdown(plan: VideoPlan) -> str:
     out = [f"# {plan.title}", "", f"**Problem:** {plan.problem}", f"**Hook:** {plan.hook}", "", "## Characters"]
     for c in plan.characters:
@@ -102,4 +181,7 @@ def to_markdown(plan: VideoPlan) -> str:
         "",
         f"**Thumbnail prompt:** {plan.thumbnail_prompt}",
     ]
+    if isinstance(plan, MoneyVideoPlan):
+        out += ["", f"**Domain:** {plan.domain}", f"**CTA:** {plan.cta}", "", "## Check these claims before posting"]
+        out += [f"- [ ] {c}" for c in plan.claims_to_verify] or ["- (none)"]
     return "\n".join(out) + "\n"
