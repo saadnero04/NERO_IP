@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The AI Side Income Playbook 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 22mm 20mm 24mm 20mm; }
+  @page :first { margin: 0; }
+  :root {
+    --ink: #16201c; --muted: #5b6662; --brand: #0f7a4f; --brand-dark: #0a4f34;
+    --gold: #e8b931; --paper: #ffffff; --tint: #eef7f2; --line: #d6e3dc; --warn: #fff6dd;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--paper); color: var(--ink); }
+  body { font-family: Inter, Arial, sans-serif; font-size: 10.6pt; line-height: 1.6; margin: 0; }
+  h1, h2, h3 { font-family: Fraunces, Georgia, serif; line-height: 1.15; color: var(--ink); }
+  h1 { font-size: 30pt; margin: 0 0 6mm; }
+  h2 { font-size: 16pt; margin: 9mm 0 3mm; color: var(--brand-dark); }
+  h3 { font-family: Inter, sans-serif; font-size: 11.5pt; font-weight: 700; margin: 6mm 0 2mm; }
+  p { margin: 0 0 3mm; }
+  ul, ol { margin: 0 0 4mm; padding-left: 6mm; }
+  li { margin-bottom: 1.5mm; }
+  strong { font-weight: 700; }
+  a { color: var(--brand); }
+
+  /* Cover */
+  .cover { height: 297mm; width: 210mm; background: linear-gradient(160deg, #0a4f34 0%, #0f7a4f 55%, #14965f 100%);
+           color: #fff; padding: 28mm 22mm; position: relative; page-break-after: always; overflow: hidden; }
+  .cover .tag { display: inline-block; background: var(--gold); color: #1b1600; font-weight: 800; letter-spacing: .08em;
+                font-size: 9pt; padding: 2mm 4mm; border-radius: 2mm; }
+  .cover h1 { color: #fff; font-size: 44pt; margin: 14mm 0 6mm; }
+  .cover .sub { font-size: 15pt; max-width: 140mm; opacity: .92; }
+  .cover .coin { position: absolute; right: -30mm; bottom: 40mm; width: 140mm; height: 140mm; border-radius: 50%;
+                 background: radial-gradient(circle at 35% 30%, #ffe58a, #e8b931 45%, #b8860b 100%);
+                 box-shadow: 0 0 0 6mm rgba(255,255,255,.08), 0 0 0 14mm rgba(255,255,255,.05);
+                 display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif;
+                 font-size: 110pt; color: rgba(90,60,0,.55); font-weight: 800; }
+  .cover .by { position: absolute; left: 22mm; bottom: 24mm; font-size: 11pt; opacity: .85; }
+
+  /* Chapters */
+  .chapter { page-break-before: always; }
+  .kicker { color: var(--brand); font-weight: 800; letter-spacing: .12em; font-size: 9pt; text-transform: uppercase; margin-bottom: 2mm; }
+  .lead { font-size: 12.5pt; color: var(--muted); margin-bottom: 6mm; }
+
+  .box { border-radius: 3mm; padding: 4mm 5mm; margin: 4mm 0 5mm; page-break-inside: avoid; }
+  .box.tip { background: var(--tint); border-left: 1.4mm solid var(--brand); }
+  .box.warn { background: var(--warn); border-left: 1.4mm solid var(--gold); }
+  .box.action { background: #16201c; color: #fff; }
+  .box.action h3 { color: var(--gold); margin-top: 0; }
+  .box h3 { margin-top: 0; }
+  .box p:last-child, .box ul:last-child, .box ol:last-child { margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.6pt; page-break-inside: avoid; }
+  th { background: var(--brand-dark); color: #fff; text-align: left; padding: 2mm 3mm; font-weight: 600; }
+  td { border-bottom: 0.3mm solid var(--line); padding: 2mm 3mm; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7faf8; }
+
+  .template { font-family: "Courier New", monospace; font-size: 9.4pt; background: #f4f6f5; border: 0.3mm dashed #9fb5aa;
+              border-radius: 2mm; padding: 4mm; white-space: pre-wrap; margin: 3mm 0 5mm; page-break-inside: avoid; line-height: 1.5; }
+  .check li { list-style: none; position: relative; padding-left: 2mm; }
+  .check li::before { content: "☐"; position: absolute; left: -5mm; color: var(--brand); }
+  .toc ol { padding-left: 0; list-style: none; counter-reset: c; }
+  .toc li { counter-increment: c; display: flex; gap: 4mm; border-bottom: 0.3mm dotted var(--line); padding: 2mm 0; font-size: 11.5pt; }
+  .toc li::before { content: counter(c, decimal-leading-zero); color: var(--brand); font-weight: 800; width: 9mm; }
+  .small { font-size: 9pt; color: var(--muted); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <span class="tag">2026 EDITION</span>
+  <h1>The AI Side Income Playbook</h1>
+  <p class="sub">A practical, step-by-step plan to sell AI-powered services to small businesses and land your first paying clients, without quitting your job.</p>
+  <div class="coin">$</div>
+  <p class="by">by Cashy · Practical money moves for 2026</p>
+</section>
+
+<section>
+  <h2 style="margin-top:0">Before you start</h2>
+  <p><strong>What this book is:</strong> a working manual. Every chapter ends with actions you can do the same day. You will find templates to copy, prices to start from, tools to use, and a 30-day plan.</p>
+  <p><strong>What this book is not:</strong> a "get rich quick" secret. Nobody can honestly promise you a specific income. What you earn depends on the hours you put in, your skills, your market and some luck. Most people who follow a plan like this one take several weeks to land a first client and several months to build a steady side income.</p>
+  <div class="box warn">
+    <h3>Disclaimer</h3>
+    <p class="small">This book is for education only and is not financial, legal or tax advice. Results vary and are not guaranteed. Platform rules, tool features and fees change often: always check the current terms of any platform you use. Check your local rules on declaring freelance income and paying tax on it.</p>
+  </div>
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li>Why one salary isn't enough anymore</li>
+      <li>The 2026 opportunity: businesses need AI, not AI courses</li>
+      <li>Pick your service: 5 options compared</li>
+      <li>Learn your skill in 7 days</li>
+      <li>Build a portfolio with zero clients</li>
+      <li>Find your first client</li>
+      <li>Pricing, packages and delivery</li>
+      <li>From first client to steady income</li>
+      <li>How to spot "make money with AI" scams</li>
+      <li>Your 30-day action plan</li>
+      <li>Bonus: 50 prompts, templates and calculators</li>
+    </ol>
+  </div>
+</section>
