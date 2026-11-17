@@ -1,4 +1,4 @@
-# TikTok launch plan: Cashy money channel
+# TikTok launch plan: AI Money Moves (@aimoneymoves)
 
 Goal: post videos every day that bring people from **video → comment "AI" → ebook sale ($15)**.
 
@@ -8,10 +8,10 @@ Goal: post videos every day that bring people from **video → comment "AI" → 
 
 ### Set up the account
 1. Create a **new TikTok account** with a new email, used only for this channel.
-2. **Username:** short, easy and money-related, e.g. `@cashy.money`, `@cashymoves` or `@ai.money.cashy`.
+2. **Username:** short, easy and money-related, **`@aimoneymoves`** (if taken: `@aimoneymoves.co`, `@theaimoneymoves`, `@aimoneymoves_`). Display name: **AI Money Moves**. Grab the same name on Instagram, YouTube and Gumroad on the same day.
 3. **Profile photo:** Cashy's face (the gold coin character) on a green background.
 4. **Bio** (max 80 characters):
-   `AI side income, explained simply 💸 | Comment "AI" for my free guide ⬇️`
+   `AI Money Moves 💸 Real AI side income, no hype | Comment "AI" ⬇️`
 5. **Switch to a Business account** (Settings → Account → Switch to Business account). It gives you analytics and, in many countries, a website link in the bio. Personal accounts usually need about 1,000 followers for a bio link, so check what your account shows.
 6. **Warm up the account for 1–2 days before posting.** Spend 20–30 minutes a day watching, liking and commenting on videos about money, side hustles and AI. This teaches TikTok which audience you belong to.
 

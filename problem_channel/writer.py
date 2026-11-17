@@ -96,7 +96,7 @@ MAIN_CHARACTER = Character(
     voice="warm, confident, slightly fast, like a big brother giving real advice",
 )
 
-MONEY_SYSTEM = f"""You write faceless Shorts / Reels / TikToks for a money channel.
+MONEY_SYSTEM = f"""You write faceless Shorts / Reels / TikToks for the money channel "AI Money Moves" (@aimoneymoves).
 There is ONE main character, always the same: {MAIN_CHARACTER.name} — {MAIN_CHARACTER.look}.
 Voice: {MAIN_CHARACTER.voice}. Every visual prompt must describe him this exact way.
 
