@@ -26,18 +26,25 @@
   a { color: var(--brand); }
 
   /* Cover */
-  .cover { height: 297mm; width: 210mm; background: linear-gradient(160deg, #0a4f34 0%, #0f7a4f 55%, #14965f 100%);
-           color: #fff; padding: 28mm 22mm; position: relative; page-break-after: always; overflow: hidden; }
-  .cover .tag { display: inline-block; background: var(--gold); color: #1b1600; font-weight: 800; letter-spacing: .08em;
-                font-size: 9pt; padding: 2mm 4mm; border-radius: 2mm; }
-  .cover h1 { color: #fff; font-size: 44pt; margin: 14mm 0 6mm; }
-  .cover .sub { font-size: 15pt; max-width: 140mm; opacity: .92; }
-  .cover .coin { position: absolute; right: -30mm; bottom: 40mm; width: 140mm; height: 140mm; border-radius: 50%;
-                 background: radial-gradient(circle at 35% 30%, #ffe58a, #e8b931 45%, #b8860b 100%);
-                 box-shadow: 0 0 0 6mm rgba(255,255,255,.08), 0 0 0 14mm rgba(255,255,255,.05);
-                 display: flex; align-items: center; justify-content: center; font-family: Fraunces, serif;
-                 font-size: 110pt; color: rgba(90,60,0,.55); font-weight: 800; }
-  .cover .by { position: absolute; left: 22mm; bottom: 24mm; font-size: 11pt; opacity: .85; }
+  .cover { height: 297mm; width: 210mm; position: relative; overflow: hidden; page-break-after: always; text-align: center; color: #fff;
+           background: radial-gradient(ellipse at 50% 35%, #1b2420 0%, #0b0f0d 60%, #050706 100%); padding-top: 20mm; }
+  .cover .bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .cover > *:not(.bg) { position: relative; }
+  .cover .tags, .cover .bottomtags { font-size: 8.5pt; letter-spacing: .22em; color: #d9d3bf; font-weight: 600; }
+  .cover .the { font-size: 20pt; font-weight: 800; letter-spacing: .12em; margin-top: 12mm; }
+  .cover .t1, .cover .t2 { font-family: Inter, Arial, sans-serif; font-weight: 900; line-height: .92; letter-spacing: -.01em; }
+  .cover .t1 { font-size: 66pt; color: #f4f5f3; }
+  .cover .t2 { font-size: 78pt; color: #ecbd36; text-shadow: 0 .6mm 0 #a87a0b; }
+  .cover .t3, .cover .author { display: flex; align-items: center; justify-content: center; gap: 5mm; }
+  .cover .t3 { font-size: 22pt; font-weight: 800; letter-spacing: .3em; color: #fff; margin-top: 3mm; }
+  .cover .t3 span, .cover .author span { display: block; width: 26mm; height: .5mm; background: linear-gradient(90deg, transparent, #e8b931, transparent); }
+  .cover .sub { font-size: 12.5pt; color: #e6e6e1; margin: 6mm auto 0; line-height: 1.5; }
+  .cover .sub em { color: #e8b931; font-style: normal; font-weight: 700; }
+  .cover .art { width: 160mm; margin: 8mm auto 4mm; display: block; }
+  .cover .bottomtags { margin-top: 2mm; }
+  .cover .motto { display: inline-block; margin-top: 7mm; border: .45mm solid #e8b931; border-radius: 1.5mm; padding: 2.5mm 7mm;
+                  letter-spacing: .25em; font-size: 10pt; font-weight: 700; color: #f3e6b8; }
+  .cover .author { margin-top: 7mm; font-size: 14pt; font-weight: 700; letter-spacing: .2em; }
 
   /* Chapters */
   .chapter { page-break-before: always; }
@@ -94,11 +101,73 @@
 <body>
 
 <section class="cover">
-  <span class="tag">2026 EDITION</span>
-  <h1>The AI Side Income Playbook</h1>
-  <p class="sub">Land your first paying clients with AI services, then grow into digital products and your own brand. Step by step, without quitting your job.</p>
-  <div class="coin">$</div>
-  <p class="by">by Cashy · Practical money moves for 2026</p>
+  <svg class="bg" viewBox="0 0 210 297" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#e8b931" stroke-opacity=".16" stroke-width=".25">
+      <path d="M150 0 C 120 60, 230 90, 190 150 S 200 260, 240 297"/>
+      <path d="M156 0 C 126 60, 236 90, 196 150 S 206 260, 246 297"/>
+      <path d="M162 0 C 132 60, 242 90, 202 150 S 212 260, 252 297"/>
+      <path d="M-30 210 C 20 190, 30 260, 80 297"/>
+      <path d="M-30 216 C 20 196, 30 266, 86 297"/>
+      <path d="M-30 222 C 20 202, 30 272, 92 297"/>
+    </g>
+  </svg>
+  <div class="tags">PRACTICAL STEPS &nbsp;|&nbsp; REAL CLIENTS &nbsp;|&nbsp; 2026 EDITION</div>
+  <div class="the">THE</div>
+  <div class="t1">AI SIDE</div>
+  <div class="t2">INCOME</div>
+  <div class="t3"><span></span>PLAYBOOK<span></span></div>
+  <p class="sub">Land your first client in 30 days.<br>Then grow into <em>products</em> and your own <em>brand</em>.</p>
+
+  <svg class="art" viewBox="0 0 300 170" aria-hidden="true">
+    <defs>
+      <radialGradient id="glow" cx="50%" cy="55%" r="50%"><stop offset="0" stop-color="#e8b931" stop-opacity=".45"/><stop offset="1" stop-color="#e8b931" stop-opacity="0"/></radialGradient>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe58a"/><stop offset=".5" stop-color="#e8b931"/><stop offset="1" stop-color="#a87a0b"/></linearGradient>
+      <linearGradient id="scr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1d2622"/><stop offset="1" stop-color="#0b0f0d"/></linearGradient>
+    </defs>
+    <ellipse cx="150" cy="95" rx="140" ry="75" fill="url(#glow)"/>
+    <!-- circuit lines -->
+    <g stroke="#e8b931" stroke-width="1" fill="none" opacity=".85">
+      <path d="M150 52 V30 H110 V18"/><path d="M150 52 V30 H190 V18"/>
+      <path d="M120 72 H70 V50 H48"/><path d="M180 72 H230 V50 H252"/>
+      <path d="M120 88 H60 V104 H40"/>
+    </g>
+    <g fill="#e8b931"><circle cx="110" cy="18" r="2.4"/><circle cx="190" cy="18" r="2.4"/><circle cx="48" cy="50" r="2.4"/><circle cx="252" cy="50" r="2.4"/><circle cx="40" cy="104" r="2.4"/></g>
+    <!-- icon tiles -->
+    <g stroke="#e8b931" stroke-width="1.1" fill="#0d1210">
+      <rect x="96" y="2" width="28" height="18" rx="3"/><rect x="176" y="2" width="28" height="18" rx="3"/>
+      <rect x="22" y="40" width="26" height="20" rx="3"/><rect x="252" y="40" width="26" height="20" rx="3"/>
+      <rect x="14" y="94" width="26" height="20" rx="3"/>
+    </g>
+    <g stroke="#ffe58a" stroke-width="1" fill="none" stroke-linecap="round">
+      <path d="M103 8 h14 M103 11 h10 M103 14 h12"/>
+      <path d="M184 6 l8 5 -8 5 z"/>
+      <path d="M28 54 l5 -6 4 4 5 -7"/>
+      <circle cx="265" cy="47" r="3"/><path d="M259 56 a6 5 0 0 1 12 0"/>
+      <path d="M20 99 h12 l-2 8 h-9 z M22 110 h1 M29 110 h1"/>
+      
+    </g>
+    <!-- laptop -->
+    <rect x="102" y="50" width="96" height="62" rx="4" fill="url(#scr)" stroke="#e8b931" stroke-width="1.3"/>
+    <path d="M86 116 H214 L206 124 H94 Z" fill="#2a2f2c" stroke="#e8b931" stroke-width="1"/>
+    <!-- chip -->
+    <g stroke="#e8b931" stroke-width="1">
+      <path d="M136 66 v-5 M144 66 v-5 M152 66 v-5 M160 66 v-5 M136 96 v5 M144 96 v5 M152 96 v5 M160 96 v5 M130 72 h-5 M130 80 h-5 M130 88 h-5 M166 72 h5 M166 80 h5 M166 88 h5"/>
+    </g>
+    <rect x="130" y="66" width="36" height="30" rx="4" fill="#111714" stroke="url(#gold)" stroke-width="2"/>
+    <text x="148" y="87" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="16" fill="#fff">AI</text>
+    <!-- coins + arrow -->
+    <g fill="url(#gold)" stroke="#8a6408" stroke-width=".5">
+      <ellipse cx="226" cy="122" rx="11" ry="3.5"/><ellipse cx="226" cy="118" rx="11" ry="3.5"/><ellipse cx="226" cy="114" rx="11" ry="3.5"/>
+      <ellipse cx="250" cy="122" rx="11" ry="3.5"/><ellipse cx="250" cy="118" rx="11" ry="3.5"/><ellipse cx="250" cy="114" rx="11" ry="3.5"/><ellipse cx="250" cy="110" rx="11" ry="3.5"/><ellipse cx="250" cy="106" rx="11" ry="3.5"/>
+      <rect x="268" y="84" width="9" height="40" rx="1"/><rect x="281" y="70" width="9" height="54" rx="1"/>
+    </g>
+    <path d="M208 106 L238 92 L256 98 L292 58" fill="none" stroke="url(#gold)" stroke-width="3" stroke-linecap="round"/>
+    <path d="M282 56 L294 55 L292 67 Z" fill="#ffe58a"/>
+  </svg>
+
+  <div class="bottomtags">CHOOSE A SERVICE &nbsp;|&nbsp; FIND CLIENTS &nbsp;|&nbsp; BUILD A BRAND</div>
+  <div class="motto">SMARTER WORK · REAL INCOME</div>
+  <div class="author"><span></span>by CASHY<span></span></div>
 </section>
 
 <section>

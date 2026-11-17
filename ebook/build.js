@@ -69,6 +69,21 @@ function opener(label, num, title, headings) {
     headerTemplate: '<span></span>',
     footerTemplate: '<div style="width:100%;font-size:8px;color:#8a958f;font-family:Arial;padding:0 20mm;display:flex;justify-content:space-between"><span>The AI Side Income Playbook 2026</span><span class="pageNumber"></span></div>',
   });
+  // Remove the footer from the cover page by re-rendering page 1 without it.
+  await page.pdf({ path: path.join(__dirname, '.cover.pdf'), format: 'A4', printBackground: true, pageRanges: '1' });
   await browser.close();
+  try {
+    const { execFileSync } = require('child_process');
+    const out = path.join(__dirname, 'AI-Side-Income-Playbook-2026.pdf');
+    execFileSync('python3', ['-c', `
+from pypdf import PdfReader, PdfWriter
+import sys
+cover, book, tmp = sys.argv[1:4]
+w = PdfWriter(); w.add_page(PdfReader(cover).pages[0])
+for p in PdfReader(book).pages[1:]: w.add_page(p)
+w.write(tmp)`, path.join(__dirname, '.cover.pdf'), out, out + '.tmp']);
+    fs.renameSync(out + '.tmp', out);
+  } catch (e) { console.log('pypdf not available, cover keeps footer'); }
+  fs.rmSync(path.join(__dirname, '.cover.pdf'), { force: true });
   console.log('PDF written');
 })();
